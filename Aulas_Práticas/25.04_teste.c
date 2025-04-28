@@ -1,53 +1,59 @@
-/*
-Eu tava com um problema que o código funciona em outros compiladores, mas não no VSCode, ai mandei pro gpt e ele me retornou isso.
-Arrumou os problemas, mas preciso entendê-los ainda.
+// Faça um programa que armazena nomes
+// O programa deve armazenar todos na mesma string
+// O tamanho da string deve crescer e diminuir conforme nomes forem colocados ou removidos.
+    //Não pode ter desperdício de memória
 
-Também preciso finalizar o código.
+//Faça o seguinte menu: 
+    //1- Adicionar nome
+    //2- Remover nome
+    //3- Listas
+    //4- Sair
 
-*/
+#define TAM 1000
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define TAM 1000
-
 char *addNome(char *nomes);
 int menu();
 
-int main() {
+int main(){
     char *nomes = malloc(TAM);
-    if (nomes == NULL) {
-        printf("Erro de memória!\n");
-        return 1;
-    }
-    nomes[0] = '\0';  // Inicializa string vazia
-
+    nomes[0] = '\0'; //Inicializa a string com vazio, pra n dar problema com o strcat
     int opc;
-    while (1) {
+    
+    while(1){
         opc = menu();
-        switch (opc) {
+        switch(opc){
             case 1:
                 nomes = addNome(nomes);
-                break;
+            break;
+    
             case 2:
-                // Ainda não implementado
-                break;
+                //ainda não implementado
+            break;
+    
             case 3:
                 printf("%s", nomes);
-                break;
+            break;
+    
             case 4:
                 free(nomes);
                 return 0;
+            break;
+    
             default:
                 printf("Opção inválida\n");
-                break;
+            break;
+    
         }
     }
 }
-
-int menu() {
+    
+int menu(){
     int opc;
+
     printf("--------- Menu Insano ---------\n");
     printf("\t1. Adicionar nome\n");
     printf("\t2. Remover nome\n");
@@ -56,24 +62,43 @@ int menu() {
     printf("-------------------------------\n");
     printf("Digite a sua opção: ");
     scanf("%d", &opc);
+
     return opc;
 }
-
-char *addNome(char *nomes) {
-    char temp[TAM];
+    
+char *addNome(char *nomes){
+    char temp[TAM]; //ao declarar dessa forma, temp automaticamente libera a memória após finalizar a função
 
     printf("Digite nome: ");
-    getchar();  // Limpa o \n pendente
+    getchar();
     fgets(temp, TAM, stdin);
-
-    size_t novo_tamanho = strlen(nomes) + strlen(temp) + 1;
-    nomes = realloc(nomes, novo_tamanho);
-    if (nomes == NULL) {
-        printf("Erro de memória!\n");
-        exit(1);
-    }
+    //O segredo ta em realocar o espaço aqui sempre que adicionar uma nova string
+    //o tamanho atual + o tamanho que vai ser adicionado + 1 pro \0
+        //size_t é um tipo usado para guardar tamanhos
+    size_t novoTam = sizeof(nomes) + sizeof(temp) + 1;
+    nomes = realloc(nomes, novoTam); 
 
     strcat(nomes, temp);
 
     return nomes;
 }
+    
+/*
+void removeNome(char *nomes){
+    int i;
+
+    char *remove;
+
+    printf("Digite nome a ser removido: ");
+    getchar();
+    fgets(remove, TAM, stdin);
+
+    for(i = 0; i != '\0'; i++){
+        if(remove[0] == nomes[i]){
+            while(nomes[i] != '\n'){
+
+            }
+        }
+    }
+}
+*/  
