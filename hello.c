@@ -2,7 +2,7 @@
 
 int main(){
     int i = 10;
-    printf("Hello World");
-    i = 1;
+    printf("Hello World\n");
+    scanf("%d", &i);
     printf("%d", i);
 }

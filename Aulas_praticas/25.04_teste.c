@@ -110,7 +110,7 @@ void *removeNome(char *nomes){
                 //Aqui vai dar um problema, se o primeiro nome for menor que o segundo, por exemplo Ana e Anabelle, a flag vai vir ativada.
                 //preciso trazer todo o resto da string pra cá
                 //em outras palavras, tudo que ta depois do I pra onde tá o pos_remove
-                while(pos_remove != '\0'){
+                while(nomes[pos_remove] != '\0'){
                     nomes[pos_remove] = nomes[i]; //i termina na \n do nome que eu to removendo.
                     i++;
                     pos_remove++;
