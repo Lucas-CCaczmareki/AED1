@@ -46,7 +46,7 @@ int main(){
             break;
     
             default:
-                printf("Opção inválida\n");
+                printf("Opcao invalida\n");
             break;
     
         }
@@ -61,8 +61,8 @@ int menu(){
     printf("\t2. Remover nome\n");
     printf("\t3. Listar\n");
     printf("\t4. Sair\n");
-    printf("-------------------------------\n");
-    printf("Digite a sua opção: ");
+    printf("-------------------------------\n\n");
+    printf("Digite a sua opcao: ");
     scanf("%d", &opc);
 
     return opc;
@@ -107,15 +107,17 @@ void *removeNome(char *nomes){
                 j++;
             }
             if(f_nomedif == 0){ //se a flag continuar zerada, eu sei que os nomes são iguais
-                //Aqui vai dar um problema, se o primeiro nome for menor que o segundo, por exemplo Ana e Anabelle, a flag vai vir ativada.
                 //preciso trazer todo o resto da string pra cá
                 //em outras palavras, tudo que ta depois do I pra onde tá o pos_remove
                 while(nomes[pos_remove] != '\0'){
-                    nomes[pos_remove] = nomes[i]; //i termina na \n do nome que eu to removendo.
+                    //i termina na \n do nome que eu to removendo.
+                    //i + 1 puxa a primeira letra ou o \0, pra evitar que fique dois \n
+                    nomes[pos_remove] = nomes[i + 1]; 
                     i++;
                     pos_remove++;
                 }
-                printf("Nome removido com sucesso!");
+                nomes[pos_remove] = '\0';
+                printf("Nome removido com sucesso!\n");
                 return nomes;
             } else {
                 //se os nomes forem diferentes, ex Anabelle e Ana.
@@ -125,6 +127,6 @@ void *removeNome(char *nomes){
             }
         }
     }
-    printf("Esse nome não está contido na string!");
+    printf("Esse nome nao esta contido na string!\n");
     return nomes;
 }
