@@ -16,6 +16,7 @@
 #include <string.h>
 
 char *addNome(char *nomes);
+void *removeNome(char *nomes);
 int menu();
 
 int main(){
@@ -32,6 +33,7 @@ int main(){
     
             case 2:
                 //ainda não implementado
+                nomes = removeNome(nomes);
             break;
     
             case 3:
@@ -83,22 +85,46 @@ char *addNome(char *nomes){
     return nomes;
 }
     
-/*
-void removeNome(char *nomes){
-    int i;
 
-    char *remove;
+void *removeNome(char *nomes){
+    int i, j = 0, pos_remove, f_nomedif = 0;
+
+    char remove[TAM];
 
     printf("Digite nome a ser removido: ");
     getchar();
     fgets(remove, TAM, stdin);
 
-    for(i = 0; i != '\0'; i++){
-        if(remove[0] == nomes[i]){
-            while(nomes[i] != '\n'){
-
+    for(i = 0; nomes[i] != '\0'; i++){ // percorre toda a string
+        if(remove[0] == nomes[i]){ //pode ter encontrado uma palavra
+            pos_remove = i;
+            while(nomes[i] != '\n'){ //enquanto não chegar no final do nome
+                if(nomes[i] != remove[j]){ //testa pra ver se os nomes são diferentes
+                    f_nomedif = 1; 
+                    break; //posso ativar uma flag que as palavras são diferentes
+                }
+                i++;
+                j++;
+            }
+            if(f_nomedif == 0){ //se a flag continuar zerada, eu sei que os nomes são iguais
+                //Aqui vai dar um problema, se o primeiro nome for menor que o segundo, por exemplo Ana e Anabelle, a flag vai vir ativada.
+                //preciso trazer todo o resto da string pra cá
+                //em outras palavras, tudo que ta depois do I pra onde tá o pos_remove
+                while(pos_remove != '\0'){
+                    nomes[pos_remove] = nomes[i]; //i termina na \n do nome que eu to removendo.
+                    i++;
+                    pos_remove++;
+                }
+                printf("Nome removido com sucesso!");
+                return nomes;
+            } else {
+                //se os nomes forem diferentes, ex Anabelle e Ana.
+                f_nomedif = 0; //zera a flag pra caso o nome esteja mais pro final da string.
+                j = 0; //zera o contador que percorre uma das palavras.
+                //pos_remove meio que fodase
             }
         }
     }
+    printf("Esse nome não está contido na string!");
+    return nomes;
 }
-*/  
