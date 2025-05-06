@@ -15,7 +15,7 @@ int main( void ) {
     char    text[30];
 
     if( ( fp = fopen("line.txt", "r") ) == NULL ) {
-        printf( "Erro ao abrir o arquivo!" );
+        printf( "Error while opening the file!" );
         return 1;
     }
 
@@ -29,6 +29,6 @@ int main( void ) {
     }
     fclose(fp);
 
-    printf( "Esse arquivo tem %d linhas!", line );
+    printf( "This arquive has %d lines!", line );
     return 0;
 }
