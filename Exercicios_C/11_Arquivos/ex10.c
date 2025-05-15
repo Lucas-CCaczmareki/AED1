@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
-#include <unistd.h>
+#include <unistd.h> 
 
 /*
 ================================================================
@@ -24,18 +24,25 @@ int main ( void ) {
 
     int population, largestPop = 0;
 
+    system("cls");
+
     printf( "Type the input file name: " );
     scanf( " %s", arqNameInput );
 
+
+    //Explicação rápida sobre o debug, com o fileDirname ele trabalha com o a.exe dentro do diretório q eu to
+    //e manda as coisas pra cá, só que ai com arquivos eu preciso ter o .txt dentro da pasta q o debugger acessa
+    // que nesse caso não é a output, é a 11_Arquivos. e ele me retorna o txt aqui dentro tbm.
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
     printf("DEBUG - Current working directory: %s\n", cwd);
+    
 
     if( ( in = fopen(arqNameInput, "r") ) == NULL ){
         printf( "Error while opening the file" );
         return 1;
     }
-    //ainda n ta pronto n
+
     printf( "Type the output file name: " );
     scanf( " %s", arqNameOutput );
     
@@ -47,7 +54,7 @@ int main ( void ) {
 
     //essa linha signifca que ele lerá 40 caracteres do "in" e depois lerá um número inteiro
     while( fscanf(in, "%40c%d\n", city, &population) == 2 ) { //fscanf retorna o número de itens que ele conseguiu analisar corretamente, se = 2, continuamos
-        city[41] = '\0';
+        city[40] = '\0';
 
         if( population > largestPop ) {
             largestPop = population;

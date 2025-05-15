@@ -1,6 +1,6 @@
-Dom Feliciano                          15000
-Camaqua                                25000
-Tapes                                  20000
-Porto Alegre                          100000
+Dom Feliciano                           15000
+Camaqua                                 25000
+Tapes                                   20000
+Porto Alegre                            100000
 Chuvisca                                5000
-Pelotas                                90000
+Pelotas                                 90000
