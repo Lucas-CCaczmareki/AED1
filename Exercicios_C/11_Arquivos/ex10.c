@@ -35,7 +35,7 @@ int main ( void ) {
         printf( "Error while opening the file" );
         return 1;
     }
-
+    //ainda n ta pronto n
     printf( "Type the output file name: " );
     scanf( " %s", arqNameOutput );
     
