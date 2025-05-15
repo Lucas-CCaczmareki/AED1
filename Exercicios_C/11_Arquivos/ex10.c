@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 /*
 ================================================================
@@ -25,6 +26,10 @@ int main ( void ) {
 
     printf( "Type the input file name: " );
     scanf( " %s", arqNameInput );
+
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    printf("DEBUG - Current working directory: %s\n", cwd);
 
     if( ( in = fopen(arqNameInput, "r") ) == NULL ){
         printf( "Error while opening the file" );
@@ -50,5 +55,6 @@ int main ( void ) {
         }
     }
     fprintf( out, "%s %d", mostPopCity, largestPop );
-
+    
+    return 0;
 }
