@@ -11,14 +11,12 @@ bool atLeast2Adj(char **board, int boardSize, int boardColSize, int l, int c, ch
 int main() {
     // Exemplo de tabuleiro
     char *board[] = {
-        "ABCE",
-        "SFCS",
-        "ADEE"
+        "AA"
     };
 
-    int boardSize = 3;               // número de linhas
-    int boardColSize = 4;            // número de colunas por linha (fixo neste exemplo)
-    char word[] = "SEE";          // palavra a ser buscada
+    int boardSize = 1;               // número de linhas
+    int boardColSize = 2;            // número de colunas por linha (fixo neste exemplo)
+    char word[] = "AA";          // palavra a ser buscada
 
     bool found = exist(board, boardSize, &boardColSize, word);
 
@@ -103,7 +101,7 @@ bool isAdjacent(char *word, char **board, int l, int c, int w_pos, int boardSize
             }
             
             //Verifica se a letra seguinte está na direita, trata o final do tabuleiro.
-            if( i == 3 && c != (*boardColSize-1) && word[w_pos + 1] == board[l][c + 1] && word[w_pos + 1] != board[lastL][lastC] ) {       
+            if( i == 3 && c != (*boardColSize-1) && word[w_pos + 1] == board[l][c + 1] && (w_pos == 0 || word[w_pos + 1] != board[lastL][lastC]) ) {       
                 f_adjs[i] = isAdjacent(word, board, l, c+1, w_pos+1, boardSize, boardColSize, l, c);
             }
         }
@@ -131,6 +129,7 @@ bool isAdjacent(char *word, char **board, int l, int c, int w_pos, int boardSize
         }
         
         //Verifica se a letra seguinte está na direita, trata o final do tabuleiro.
+        //O problema tá aqui, na ocndição de que a próxima não pode ser igual à anterior caso a anterior seja a primeira posição da word.
         if(c != (*boardColSize-1) && word[w_pos + 1] == board[l][c + 1] && word[w_pos + 1] != board[lastL][lastC] ) {       
             return isAdjacent(word, board, l, c+1, w_pos+1, boardSize, boardColSize, l, c);
         }
