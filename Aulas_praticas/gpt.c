@@ -69,85 +69,61 @@ bool atLeast2Adj(char **board, int boardSize, int boardColSize, int l, int c, ch
 
 //OK? 
 bool isAdjacent(char *word, char **board, int l, int c, int w_pos, int boardSize, int* boardColSize, bool** visited){
-    //vai ter que tratar caso tenha uma adjacente em duas posições diferentes
     bool f_2adj = false;
     bool f_adjs[4] = {false};
     int i;
 
     visited[l][c] = true;
 
-     //Se o próximo caracter for \0, significa que chegamos ao final da string com sucesso.
     if(word[w_pos + 1] == '\0'){
         return true;
     }
 
-    //vamo fazer uma função útil pra isso vai
-    //verifica se tem pelo menos duas adjacentes válidas
     f_2adj = atLeast2Adj(board, boardSize, *boardColSize, l, c, word[w_pos+1]);
-    
-    
+
     if(f_2adj){
-        //aqui é pensando no pior caso, as 4 adjacentes são iguais
-        //assim, vai executar uma chamada recursiva pra cada adjacente, se todas retornarem falso, voila
-        for( i = 0; i < 4; i++){
-            //Verifica se a letra seguinte está acima, tratando o final do tabuleiro
-            if( i == 0 && l > 0 && word[w_pos + 1] == board[l - 1][c] && !visited[l - 1][c] ) {
+        for(i = 0; i < 4; i++){
+            if(i == 0 && l > 0 && word[w_pos + 1] == board[l - 1][c] && !visited[l - 1][c]) {
                 f_adjs[i] = isAdjacent(word, board, l-1, c, w_pos+1, boardSize, boardColSize, visited);
             }
-
-            //Verifica se a letra seguinte está abaixo, tratando o final do tabuleiro (-1 pq l começa em 0)
-            if( i == 1 && l < (boardSize-1) && word[w_pos + 1] == board[l + 1][c] && !visited[l + 1][c] ) {
+            if(i == 1 && l < boardSize-1 && word[w_pos + 1] == board[l + 1][c] && !visited[l + 1][c]) {
                 f_adjs[i] = isAdjacent(word, board, l+1, c, w_pos+1, boardSize, boardColSize, visited);
             }
-
-            //Verifica se a letra seguinte está na esquerda, trata o final do tabuleiro.
-            if( i == 2 && c > 0 && word[w_pos + 1] == board[l][c - 1] && !visited[l][c - 1] ) {
+            if(i == 2 && c > 0 && word[w_pos + 1] == board[l][c - 1] && !visited[l][c - 1]) {
                 f_adjs[i] = isAdjacent(word, board, l, c-1, w_pos+1, boardSize, boardColSize, visited);
             }
-            
-            //Verifica se a letra seguinte está na direita, trata o final do tabuleiro.
-            if( i == 3 && c < (*boardColSize-1) && word[w_pos + 1] == board[l][c + 1] && !visited[l][c + 1] ) {      
+            if(i == 3 && c < (*boardColSize - 1) && word[w_pos + 1] == board[l][c + 1] && !visited[l][c + 1]) {
                 f_adjs[i] = isAdjacent(word, board, l, c+1, w_pos+1, boardSize, boardColSize, visited);
             }
         }
-        //percorre o vetor, se todas forem falsas, não tem palavra válida
-        for( i = 0; i < 4; i++){
+
+        for(i = 0; i < 4; i++){
             if(f_adjs[i]){
                 return true;
             }
         }
-        //caso a palavra não tenha sido encontrada, eu preciso zerar as posições que eu percorri
-        //como é recursivo, isso auqi vai zerando todas chamadas
+
         visited[l][c] = false;
         return false;
     } else {
-        //Verifica se a letra seguinte está acima, tratando o final do tabuleiro
-        if(l > 0 && word[w_pos + 1] == board[l - 1][c] && !visited[l - 1][c]  ) {
-            if(isAdjacent(word, board, l-1, c, w_pos+1, boardSize, boardColSize, visited)) return true; 
+        if(l > 0 && word[w_pos + 1] == board[l - 1][c] && !visited[l - 1][c]) {
+            if(isAdjacent(word, board, l-1, c, w_pos+1, boardSize, boardColSize, visited)) return true;
         }
-
-        //Verifica se a letra seguinte está abaixo, tratando o final do tabuleiro (-1 pq l começa em 0)
-        if(l < (boardSize-1) && word[w_pos + 1] == board[l + 1][c] && !visited[l + 1][c] ) {
+        if(l < boardSize-1 && word[w_pos + 1] == board[l + 1][c] && !visited[l + 1][c]) {
             if(isAdjacent(word, board, l+1, c, w_pos+1, boardSize, boardColSize, visited)) return true;
         }
-
-        //Verifica se a letra seguinte está na esquerda, trata o final do tabuleiro.
-        if(c > 0 && word[w_pos + 1] == board[l][c - 1] && !visited[l][c - 1] ) {
+        if(c > 0 && word[w_pos + 1] == board[l][c - 1] && !visited[l][c - 1]) {
             if(isAdjacent(word, board, l, c-1, w_pos+1, boardSize, boardColSize, visited)) return true;
         }
-        
-        //Verifica se a letra seguinte está na direita, trata o final do tabuleiro.
-        //O problema tá aqui, na ocndição de que a próxima não pode ser igual à anterior caso a anterior seja a primeira posição da word.
-        if(c < (*boardColSize-1) && word[w_pos + 1] == board[l][c + 1] && !visited[l][c + 1] ) {      
+        if(c < (*boardColSize - 1) && word[w_pos + 1] == board[l][c + 1] && !visited[l][c + 1]) {
             if(isAdjacent(word, board, l, c+1, w_pos+1, boardSize, boardColSize, visited)) return true;
         }
     }
-    
-    //Caso não tenhamos encontrado nada nas casas adjacentes, retorna falso.
-    //reseta as posições visitadas recursivamente.
+
     visited[l][c] = false;
     return false;
 }
+
 
 
 //OK?
