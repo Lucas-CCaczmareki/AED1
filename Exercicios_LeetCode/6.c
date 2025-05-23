@@ -1,3 +1,7 @@
+/*
+Eu preciso dar uma estudada na melhor solução q o chat gpt me mandou, a minha foi bem ineficiente
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
