@@ -47,3 +47,17 @@ The answer is "pest" because it is the word that appears earliest of the 3.
 - 1 <= words.length <= 1000
 - 1 <= words[i].length <= 15
 - words[i] consists of lower case English letters.
+
+## Testes
+### Em aula:
+Não foi testado em teste. Consegui apenas garantir que a função que tratava o licensePlate estava funcionando e pra isso usei os seguintes testes:
+- licensePlate = "1s3 PSt"
+- licensePlate = "0951s3 PSt53"
+- licensePlate = "   1 s3     PS t   "
+A lógica geral do programa foi finalizada em aula, mas teve vários erros que só tive tempo de tratar em casa.
+
+### Em casa:
+Usei os 2 testes dos exemplos do leetcode + 1 para garantir que estivesse funcionando.
+O case 3 de teste que usei foi o seguinte:
+- licensePlate: "GrC8950"
+- words: ["measure","other","every","base","according","level","meeting","none","marriage","rest"]
