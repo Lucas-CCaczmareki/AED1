@@ -30,7 +30,6 @@ int main( void ) {
     int wordsSize = sizeof(words) / sizeof(words[0]);;
     char word[50];
 
-    // a lógica tá pronta, mas to copm algum erro no meio disso tudo e eu não sei qual
     strcpy(word, shortestCompletingWord(licensePlate, words, wordsSize));
     printf( "%s", word );
 }
@@ -88,7 +87,9 @@ dentro de licensePlate.
 */
 char* shortestCompletingWord(char* licensePlate, char** words, int wordsSize) {
     char newLicensePlate[strlen(licensePlate) + 1];             //aloca segundo o pior caso
-    strcpy(newLicensePlate, licensePlateChars(licensePlate));   //copia a string convertida pra dentro da new
+    char* temp = licensePlateChars(licensePlate);               // alocação com malloc dentro do licensePlateChar
+    strcpy(newLicensePlate, temp);                              // copia a string convertida pra new
+    free(temp);                                                 // libera a memória do ponteiro q foi alocado p evitar leak
 
     int n_letterLP[26] = {0},       //inicializa em 0
         n_letterW[26] = {0},
@@ -99,6 +100,8 @@ char* shortestCompletingWord(char* licensePlate, char** words, int wordsSize) {
     //unsigned pois será usada para comparar com strlen
     //inicializa com o valor máximo pra garantir coerência
     unsigned int tamMenorPalavra = INT_MAX; 
+
+    
 
     //OK
     //Registra quantas vezes cada letra do alfabeto apareceu em licensePlate
