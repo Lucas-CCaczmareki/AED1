@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
+
+//Declaração das funções
 
 /*
 licensePlateChars
@@ -24,7 +27,7 @@ Chama a função
 */
 int main( void ) {
     char licensePlate[50] = {" 091s3  PS t "};
-    char words[4][30] = {
+    char *words[] = {
         "step",
         "steps",
         "stripe",
@@ -34,15 +37,21 @@ int main( void ) {
     char word[50];
 
     // a lógica tá pronta, mas to copm algum erro no meio disso tudo e eu não sei qual
-    strcpy(word, shortestCompletingWord(licensePlate, (char **)words, wordsSize));
+    strcpy(word, shortestCompletingWord(licensePlate, words, wordsSize));
     printf( "%s", word );
 }
 
 
 char* licensePlateChars(char* licensePlate) {
-    //printf("%s", licensePlate);
     int i;
-    int i_aux;
+    int j = 0; //conta o índice do result
+
+    //Aparentemente se eu usar a licenseplate ele modifica a string original, então melhor fazer uma cópia
+    //no vs tava funcionando, mas tava dando erro no leet
+
+    //Vou mudar um pouco a lógica, vou copiar só os caracteres válidos e/ou convertidos pra dentro de result
+
+    char* result = (char *)malloc((strlen(licensePlate) + 1) * sizeof(char));
 
     for( i = 0; licensePlate[i] != '\0'; i++){
         //lp = " 091s3  PS t "
@@ -51,11 +60,7 @@ char* licensePlateChars(char* licensePlate) {
 
         //Eliminando os espaços (e agora números tbm)
         if( licensePlate[i] == 32 || (licensePlate[i] >= 48 && licensePlate[i] <= 57) ) {
-            //agora tem que puxar toda a string dps pra esse espaço
-            for( i_aux = i; licensePlate[i_aux] != '\0'; i_aux++ ) {
-                licensePlate[i_aux] = licensePlate[i_aux + 1];
-            }
-            i--; //elimina espaços e números consecutivos
+            continue; //pula pro próximo loop e ignora
         }
 
         //Tratando as letras maiúsculas
@@ -65,18 +70,22 @@ char* licensePlateChars(char* licensePlate) {
         //z = 122
         //anda 32 na ascii pra ir de maiúscula pra minúscula
         
-        if( licensePlate[i] >= 65 && licensePlate [i] <= 90 ) {
+        if( licensePlate[i] >= 65 && licensePlate[i] <= 90 ) {
             //printf("%c", licensePlate[i]);
-            licensePlate[i] += 32;
+            result[j] = licensePlate[i] + 32;
+            j++;
             //printf("%c", licensePlate[i]);
         }
 
-        
+        //Copiando as minúsculas
+        if( licensePlate[i] >= 97 && licensePlate[i] <= 122 ) {
+            result[j] = licensePlate[i];
+            j++;
+        }
     }
-    
-    //printf("\n%s!", licensePlate);
-    //O erro tá na hora de enviar a string
-    return licensePlate;
+
+    result[j] = '\0';
+    return result;
 }
 
 /*
@@ -103,7 +112,7 @@ char* shortestCompletingWord(char* licensePlate, char** words, int wordsSize) {
     int n_letterLP[26] = {0}; //preenche com 0
     int n_letterW[26] = {0};
     int f_isNotIn = 0;
-    unsigned int tamMenorPalavra = 0;
+    unsigned int tamMenorPalavra = INT_MAX;
     int menorPalavra = 0;
 
     //preciso mandar pro índice segundo a ascii
@@ -114,46 +123,48 @@ char* shortestCompletingWord(char* licensePlate, char** words, int wordsSize) {
     } 
 
 
-    int w, l; //word e letter
+    //Aqui tá dando um segmentation fault
+    int w; //word
     for( w = 0; w < wordsSize; w++ ) {
-        for( l = 0; words[w][l] != '\0'; l++ ) {
-            //percorre cada palavra do array letra por letra
-            
-            //antes de 
-            //vou precisar de um vetor com quantas vezes a letra dessa palavra aparece agora
-            for( int i = 0; words[w][i] != '\0'; i++){
-                //armazena em ordem alfabética
-                n_letterW[words[w][i] - 'a'] += 1;
-            } 
+        //antes de ver quantas vezes cada letra aparece, eu preciso garantir que o vetor esteja zerado
+        for( int i = 0; i < 26; i++ ) {
+            n_letterW[i] = 0;
+        }
 
-            //agora eu preciso comparar os 2 vetores e ver se bate
-            for( int i = 0; i < 26; i++ ) {
-                //os vetores podem ser diferentes,
-                //mas as ocorrências de letras do license precisam ser iguais as da word
-                if(n_letterLP[i] != 0){ //confere só as letras do license
-                    if(n_letterLP[i] != n_letterW[i]){ //se isso aqui der diferente a palavra não tá contida
-                        w++; //vai pra próxima word
-                        f_isNotIn = 1;
-                        break;
-                    }
-                }
-                //Se ele terminou o for e a palavra tava contida, a flag isNotIn fica desativada
-            }
-            //meu break precisa vir pra cá (porém ainda não sei como, acho q normal ele já viria pra ca)
-            if(f_isNotIn == 0){ //se a palavra estava contida
+        //vou precisar de um vetor com quantas vezes a letra dessa palavra aparece agora
+        for( int i = 0; words[w][i] != '\0'; i++){
+            //armazena em ordem alfabética
+            n_letterW[words[w][i] - 'a'] += 1;
+        } 
 
-                //ai eu preciso guardar o tamanho e o índice W de algum jeito
-                //pensei em fazer por lógica de menor que a anterior e ai só atualizar o indice
-                //se for menor que a última que salvou
-                //isso garante que a palavra que fica salva é a primeira menor, como o problema pediu
-
-                if(sizeof(words[w]) < tamMenorPalavra){
-                    tamMenorPalavra = sizeof(words[w]);
-                    menorPalavra = w;
+        //agora eu preciso comparar os 2 vetores e ver se bate
+        for( int i = 0; i < 26; i++ ) {
+            //os vetores podem ser diferentes,
+            //mas as ocorrências de letras do license precisam ser iguais as da word
+            if(n_letterLP[i] != 0){ //confere só as letras do license
+                if(n_letterLP[i] != n_letterW[i]){ //se isso aqui der diferente a palavra não tá contida
+                    f_isNotIn = 1;
+                    break;
                 }
             }
+            //Se ele terminou o for e a palavra tava contida, a flag isNotIn fica desativada
+        }
+        //meu break precisa vir pra cá (porém ainda não sei como, acho q normal ele já viria pra ca)
+        if(f_isNotIn == 0){ //se a palavra estava contida
 
+            //ai eu preciso guardar o tamanho e o índice W de algum jeito
+            //pensei em fazer por lógica de menor que a anterior e ai só atualizar o indice
+            //se for menor que a última que salvou
+            //isso garante que a palavra que fica salva é a primeira menor, como o problema pediu
+
+            if(strlen(words[w]) < tamMenorPalavra){
+                tamMenorPalavra = strlen(words[w]);
+                menorPalavra = w;
+            }
+        } else {
+            f_isNotIn = 0; //reseta a flag
         }
     }
+
     return words[menorPalavra];
 }

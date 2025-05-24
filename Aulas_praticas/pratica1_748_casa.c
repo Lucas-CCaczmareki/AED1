@@ -4,34 +4,30 @@
 #include <string.h>
 #include <limits.h>
 
-/*
-licensePlateChars
-retira todos os espaços e números da licensePlate
-*/
+//Declaração das funções
 char* licensePlateChars(char* licensePlate);
-
-/*
-shortestCompletingWord
-
-Encontra a menor palavra dentro do array de palavras que contenha os caracteres de letra
-dentro de licensePlate.
-*/
 char* shortestCompletingWord(char* licensePlate, char** words, int wordsSize);
 
+//OK
 /*
 Main
 Cria a licensePlate, o words e wordsize.
 Chama a função
 */
 int main( void ) {
-    char licensePlate[50] = {" 091s3  PS t "};
+    char licensePlate[50] = {"GrC8950"};
     char *words[] = {
-        "step",
-        "steps",
-        "stripe",
-        "stepple"
+        "measure",
+        "other",
+        "every",
+        "base",
+        "according",
+        "level","meeting",
+        "none",
+        "marriage",
+        "rest"
     };
-    int wordsSize = 4;
+    int wordsSize = sizeof(words) / sizeof(words[0]);;
     char word[50];
 
     // a lógica tá pronta, mas to copm algum erro no meio disso tudo e eu não sei qual
@@ -39,123 +35,123 @@ int main( void ) {
     printf( "%s", word );
 }
 
-
+//OK
+/*
+licensePlateChars
+retira todos os espaços e números da licensePlate
+*/
 char* licensePlateChars(char* licensePlate) {
-    //printf("%s", licensePlate);
     int i;
-    int i_aux;
+    int j = 0;              //conta o índice do result
+    char* result =          //aloca espaço considerando o pior caso
+    (char *)malloc((strlen(licensePlate) + 1) * sizeof(char));
 
+    //Copia apenas caracteres válidos pra result
     for( i = 0; licensePlate[i] != '\0'; i++){
-        //lp = " 091s3  PS t "
-        //0 = 48 e 9 = 57
-        //blank = 32
+        /* Tabela ASCII:
+        0 = 48 e 9 = 57
+        blank = 32
+        A = 65
+        a = 97
+        Z = 90
+        z = 122
+        */
 
-        //Eliminando os espaços (e agora números tbm)
+        //Eliminando os espaços e números
         if( licensePlate[i] == 32 || (licensePlate[i] >= 48 && licensePlate[i] <= 57) ) {
-            //agora tem que puxar toda a string dps pra esse espaço
-            for( i_aux = i; licensePlate[i_aux] != '\0'; i_aux++ ) {
-                licensePlate[i_aux] = licensePlate[i_aux + 1];
-            }
-            i--; //elimina espaços e números consecutivos
+            continue;       //pula pro próximo loop e ignora
         }
 
-        //Tratando as letras maiúsculas
-        //A = 65
-        //a = 97
-        //Z = 90
-        //z = 122
-        //anda 32 na ascii pra ir de maiúscula pra minúscula
-        
-        if( licensePlate[i] >= 65 && licensePlate [i] <= 90 ) {
-            //printf("%c", licensePlate[i]);
-            licensePlate[i] += 32;
-            //printf("%c", licensePlate[i]);
+        //Convertendo e gravando caracteres maiúsculos.
+        if( licensePlate[i] >= 65 && licensePlate[i] <= 90 ) {
+            result[j] = licensePlate[i] + 32;
+            j++;
         }
 
-        
+        //Copiando as letras minúsculas
+        if( licensePlate[i] >= 97 && licensePlate[i] <= 122 ) {
+            result[j] = licensePlate[i];
+            j++;
+        }
     }
-    
-    //printf("\n%s!", licensePlate);
-    //O erro tá na hora de enviar a string
-    return licensePlate;
+
+    result[j] = '\0';       //finaliza a string
+    return result;          //retorna licensePlate com caracteres válidos
 }
 
+//OK
 /*
-- contém todas letras de licensePlate
-- ignorar nOs e espaços
-- case INsensitive
-- se um caracter aparece +1 de uma vez em lP, aparece o mesmo nO de vezes na word
-- é garantido ter uma resposta correta.
-- se tiver 2 palavras que são a shortest, retorna a 1a
+shortestCompletingWord
+
+Encontra a menor palavra dentro do array de palavras que contenha os caracteres de letra
+dentro de licensePlate.
 */
 char* shortestCompletingWord(char* licensePlate, char** words, int wordsSize) {
-    //preciso arrumar o tamanho aq dps, talvez alocar dinamicamente
-    char newLicensePlate[100];
-    //printf("%s!", licensePlate); 
-    strcpy(newLicensePlate, licensePlateChars(licensePlate));
+    char newLicensePlate[strlen(licensePlate) + 1];             //aloca segundo o pior caso
+    strcpy(newLicensePlate, licensePlateChars(licensePlate));   //copia a string convertida pra dentro da new
 
-    //agora eu preciso ver se todas as letras do newLicensePlate estão contidas na palavra do array
-    //e depois, ver, das que estão contidas, qual é a menor palavra.
+    int n_letterLP[26] = {0},       //inicializa em 0
+        n_letterW[26] = {0},
+        f_isNotIn = 0,
+        menorPalavra = 0,
+        w = 0;                      //word
 
-    //pra ver se todas letras tão contidas, eu posso criar um vetor do alfabeto pra license e pra word
-    //e ai fazer uma contagem, quantas vezes a letra X aparece em license.
-    //Ai se os números diferentes de 0 baterem tá show. Se não, não tá show
+    //unsigned pois será usada para comparar com strlen
+    //inicializa com o valor máximo pra garantir coerência
+    unsigned int tamMenorPalavra = INT_MAX; 
 
-    int n_letterLP[26] = {0}; //preenche com 0
-    int n_letterW[26] = {0};
-    int f_isNotIn = 0;
-    unsigned int tamMenorPalavra = INT_MAX;
-    int menorPalavra = 0;
-
-    //preciso mandar pro índice segundo a ascii
-    // char('a') - 'a' = 0... 
+    //OK
+    //Registra quantas vezes cada letra do alfabeto apareceu em licensePlate
     for( int i = 0; newLicensePlate[i] != '\0'; i++){
-        //armazena em ordem alfabética
+        //armazena em ordem alfabética segundo tabela ASCII
         n_letterLP[newLicensePlate[i] - 'a'] += 1;
     } 
 
-
-    //Aqui tá dando um segmentation fault
-    int w; //word
+    ///OK
+    //Percorre todas as palavras do array words para encontrar a menor
     for( w = 0; w < wordsSize; w++ ) {
-        //antes de ver quantas vezes cada letra aparece, eu preciso garantir que o vetor esteja zerado
+        
+        //OK
+        //Garante que o vetor de contagem de letras sempre comece em 0
         for( int i = 0; i < 26; i++ ) {
             n_letterW[i] = 0;
         }
 
-        //vou precisar de um vetor com quantas vezes a letra dessa palavra aparece agora
+        //OK
+        //Conta quantas vezes cada letra aparece na palavra
         for( int i = 0; words[w][i] != '\0'; i++){
             //armazena em ordem alfabética
             n_letterW[words[w][i] - 'a'] += 1;
         } 
 
-        //agora eu preciso comparar os 2 vetores e ver se bate
+        //OK
+        //Compara os 2 vetores de contagem de letra
         for( int i = 0; i < 26; i++ ) {
-            //os vetores podem ser diferentes,
-            //mas as ocorrências de letras do license precisam ser iguais as da word
-            if(n_letterLP[i] != 0){ //confere só as letras do license
-                if(n_letterLP[i] != n_letterW[i]){ //se isso aqui der diferente a palavra não tá contida
+            //Se todas ocorrências não nulas de letra em license forem iguais as mesmas na word então a palavra ta contida 
+
+            if(n_letterLP[i] != 0){                     //confere apenas as letras que aparecem em license
+                if(n_letterLP[i] <= n_letterW[i]){      //se isso aqui der (V) a comparação de letra ta OK
+                    f_isNotIn = 0;
+                } else {                                //se der falso, ai a W não ta contida
                     f_isNotIn = 1;
                     break;
                 }
             }
-            //Se ele terminou o for e a palavra tava contida, a flag isNotIn fica desativada
         }
-        //meu break precisa vir pra cá (porém ainda não sei como, acho q normal ele já viria pra ca)
-        if(f_isNotIn == 0){ //se a palavra estava contida
 
-            //ai eu preciso guardar o tamanho e o índice W de algum jeito
-            //pensei em fazer por lógica de menor que a anterior e ai só atualizar o indice
-            //se for menor que a última que salvou
-            //isso garante que a palavra que fica salva é a primeira menor, como o problema pediu
-
+        //OK
+        //Confere se a palavra tá contida
+        if(f_isNotIn == 0) { 
+            //Se o tamanho da palavra for menor que a última menor ocorrência, então a palavra atual é a menor.
             if(strlen(words[w]) < tamMenorPalavra){
-                tamMenorPalavra = strlen(words[w]);
-                menorPalavra = w;
+                tamMenorPalavra = strlen(words[w]);     //guarda o tamanho pra comparar
+                menorPalavra = w;                       //guarda o índice da menor palavra atual
             }
         } else {
-            f_isNotIn = 0; //reseta a flag
+            f_isNotIn = 0;      //reseta a flag pra próxima palavra
         }
     }
+
+    //Retorna a menor palavra encontrada
     return words[menorPalavra];
 }
