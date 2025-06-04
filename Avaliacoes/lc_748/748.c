@@ -22,12 +22,14 @@ int main( void ) {
         "every",
         "base",
         "according",
-        "level","meeting",
+        "level",
+        "meeting",
         "none",
         "marriage",
         "rest"
     };
-    int wordsSize = sizeof(words) / sizeof(words[0]);;
+
+    int wordsSize = sizeof(words) / sizeof(words[0]);
     char word[50];
 
     strcpy(word, shortestCompletingWord(licensePlate, words, wordsSize));
