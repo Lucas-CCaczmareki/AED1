@@ -17,7 +17,7 @@
 #define TEMPAGE (char *)pBuffer + 82
 #define TEMPMAIL (char *)pBuffer + 132
 
-bool alreadyIn(void* pBuffer, char* tempName, int* usedSize, char* p, char* end, int* totalPeople);
+char* searchPerson(void** pBuffer, char* tempName, int* usedSize, char* p, char* end, int* totalPeople);
 
 /*
 ==============================================
@@ -48,6 +48,7 @@ int main( void ) {
     char *tempMail = TEMPMAIL;
 
     char *p = (char *)pBuffer + dataRegion; //points to the begging of data region
+    char *p2 = (char *)pBuffer + dataRegion; //points to the begging of data region
     char *end = (char *)pBuffer + *usedSize; //points to the end of data region
     //=================================================================
     //Setting initial values
@@ -84,9 +85,10 @@ int main( void ) {
             printf("Idade: ");
             scanf("%s", tempAge);
 
-            if(alreadyIn(pBuffer, tempMail, usedSize, p, end, totalPeople)) {
+            if(searchPerson(&pBuffer, tempMail, usedSize, p, end, totalPeople) != NULL) {
                 printf("Essa pessoa ja esta na agenda!\n");
             } else {
+                *memAmount = 0;
                 *memAmount = strlen(tempName) + 1 + strlen(tempAge) + 1 + strlen(tempMail) + 1;
                 //if not enought memory, realocate with more
                 if(!( (*usedSize + *memAmount) <= *totalSize )) {   
@@ -125,26 +127,74 @@ int main( void ) {
             break;
         
         case 2:
-            /* Remove pessoa */
-            printf("Remove p1");
+            /* ========================= Remove pessoa ======================== */
+            if(*totalPeople == 0) {
+                printf("Agenda vazia!\n");
+            } else {
+                getchar();
+                printf("Quem voce deseja remover? (digite email) ");
+                scanf("%[^\n]s", tempMail);
+                
+                p = searchPerson(&pBuffer, tempMail, usedSize, p, end, totalPeople);
+                p2 = p;
+
+                if( p2 != NULL ) {
+                    //Agora é o problema: 
+                    //preciso armazenar o tamanho q eu to tirando fora (memAmount)
+                    //preciso de 1 ponteiro(p) pro início, pro final do bloco da pra calcular com o tamanho em byte
+                    //ai copia tudo dps do final do bloco pro início
+                    //e pra finalizar realoca pro tamanho total - o tamahnho disso aqui
+
+                    *memAmount = 0;
+                    *memAmount += strlen(p2) + 1; //guarda o tamanho do email
+                    p2 += strlen(p2) + 1;
+                    *memAmount += strlen(p2) + 1; //guarda o tamanho do nome
+                    p2 += strlen(p2) + 1;
+                    *memAmount += strlen(p2) + 1; //guarda o tamanho da idade
+                    p2 += strlen(p2) + 1;
+
+                    //OK, aqui eu já garanto os 2 ponteiros e o tamanho exato.
+                    end = (char *)pBuffer + *usedSize;
+
+                    //Vou precisar do tanto de memória do p2 até o end;
+                    memcpy(p, p2, (end - p2)); // copia tudo desde p2 até o fim pra onde tá o p;
+
+                    //agora só realocar
+                    pBuffer = realloc(pBuffer, (*totalSize - *memAmount));
+                    //e recolocar os ponteiros apontando pro lugar certo
+                    opt = OPT;
+                    totalSize = TOTALSIZE;
+                    usedSize = USEDSIZE;
+                    memAmount = MEMAMOUNT;
+                    totalPeople = TOTALPEOPLE;
+
+                    tempName = TEMPNAME;
+                    tempAge = TEMPAGE;
+                    tempMail = TEMPMAIL;
+
+                    *usedSize -= *memAmount;
+                    *totalSize -= *memAmount;
+                    *totalPeople -= 1;
+                } else {
+                    printf( "Essa pessoa nao esta na agenda!\n" );
+                    break;
+                }
+            }
             break;    
+            /* ================================================================ */
 
         case 3:
-            /* ====================== Busca pessoa ====================== */
-            getchar();
-            printf("Quem voce deseja buscar? (digite email): ");
-            scanf("%[^\n]s", tempMail);
-            
-            p = (char *)pBuffer + dataRegion;
-            end = (char *)pBuffer + *usedSize;
-
+            /* ========================= Busca pessoa ========================= */
             if(*totalPeople == 0) {
-                printf("Pessoa nao encontrada!\n\n");
-                break;
-            }
+                printf("Agenda vazia!\n");
+            } else {
+                getchar();
+                printf("Quem voce deseja buscar? (digite email): ");
+                scanf("%[^\n]s", tempMail);
 
-            while( p <= end ) {
-                if(strcmp(tempMail, p) == 0) {
+                //searchPerson returns null if it didnt find anyone, or a pointer to the email if it finds
+                p = searchPerson(&pBuffer, tempMail, usedSize, p, end, totalPeople);
+                if(p != NULL) {
                     printf("--------------------------\n");
                     printf("Email: %s\n", p);
                     p += strlen(p) + 1;
@@ -155,18 +205,11 @@ int main( void ) {
                     printf("Idade: %s\n", p);
                     p += strlen(p) + 1;
                     printf("--------------------------\n");
-                    break;
-                } else if(p == end) {
-                    printf("Pessoa nao encontrada!\n\n");
-                    break;
                 } else {
-                    //I could do this in a loop. Would be easier if someone wants to add new informations for each person
-                    //jumps 3 (name, age and mail) \0 to the next name
-                    p += strlen(p) + 1;
-                    p += strlen(p) + 1;
-                    p += strlen(p) + 1; //at here, p points to the next name
+                    printf("Pessoa nao encontrada");
                 }
             }
+
             break;
             /* ========================================================== */
 
@@ -177,6 +220,7 @@ int main( void ) {
 
             if(*totalPeople == 0) { //if there is no people in the agenda
                 printf("Agenda vazia!\n");
+                break;
             } else {
                 while( p < end ) { //while the memory address is before end
                     printf("--------------------------\n");
@@ -199,24 +243,25 @@ int main( void ) {
             break;
 
         default:
-            printf("Opcao invalida!");
+            printf("Opcao invalida!\n");
             break;
         }
     }
     
 }
 
-bool alreadyIn(void* pBuffer, char* tempMail, int* usedSize, char* p, char* end, int* totalPeople) {
-    p = (char *)pBuffer + dataRegion;
-    end = (char *)pBuffer + *usedSize;
+char* searchPerson(void** pBuffer, char* tempMail, int* usedSize, char* p, char* end, int* totalPeople) {
+    p = (char *)(*pBuffer) + dataRegion;
+    end = (char *)(*pBuffer) + *usedSize;
 
     if(*totalPeople == 0) {
-        return false;
+        return NULL;
     } else {
-        while( p < end ) {
+        while( p <= end ) {
             if(strcmp(tempMail, p) == 0) {
-                return true;
+                return p;
             } else {
+                //I could do this in a loop. Would be easier if someone wants to add new informations for each person
                 //jumps 3 (mail, name and age) \0 to the next nmail
                 p += strlen(p) + 1;
                 p += strlen(p) + 1;
@@ -224,5 +269,5 @@ bool alreadyIn(void* pBuffer, char* tempMail, int* usedSize, char* p, char* end,
             }
         }
     }
-    return false;
+    return NULL;
 }
