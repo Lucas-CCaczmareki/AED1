@@ -8,10 +8,10 @@
 #define controlRegion   0
 #define dataRegion      200
 
-void menu(void* pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, char *nextPerson, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
-void addPerson(void* pBuffer, int* i, char *tempName, char* tempAge, char *tempMail, char *nextPerson, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
+void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
+void addPerson(void** pBuffer, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
 bool enoughSize(int* totalSize, int* usedSize, int* memAmount);
-void increaseSize(void* pBuffer, int* totalSize, int* usedSize, int* memAmount);
+void increaseSize(void** pBuffer, int* totalSize, int* usedSize, int* memAmount);
 void showPeople (void* pBuffer, int* usedSize);
 
 /*
@@ -50,11 +50,11 @@ int main() {
     char *tempMail = (char *)pBuffer + 132; //com esse aqui, tá ocupado até o byte 182
     
     while (true) {
-        menu(&pBuffer, opt, i, tempName, tempAge, tempMail, nextPerson, totalSize, usedSize, memAmount, totalPeople);
+        menu(&pBuffer, opt, i, tempName, tempAge, tempMail, totalSize, usedSize, memAmount, totalPeople);
     }
 }
 
-void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, char *nextPerson, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
+void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
     printf("================= Agenda =================\n");
     printf("1. Adicionar pessoa\n");
     printf("2. Remover pessoa\n");
@@ -68,7 +68,7 @@ void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char 
     switch (*opt) {
     case 1:
         /* Adicionar pessoa */
-        addPerson(pBuffer, i, tempName, tempAge, tempMail, nextPerson, totalSize, usedSize, memAmount, totalPeople);
+        addPerson(*pBuffer, i, tempName, tempAge, tempMail, totalSize, usedSize, memAmount, totalPeople);
         break;
     
     case 2:
@@ -101,12 +101,12 @@ bool enoughSize(int* totalSize, int* usedSize, int* memAmount) {
     return (*usedSize + *memAmount) < *totalSize; //retorna true caso não tenha
 }
 
-void increaseSize(void* pBuffer, int* totalSize, int* usedSize, int* memAmount) {
+void increaseSize(void** pBuffer, int* totalSize, int* usedSize, int* memAmount) {
     *totalSize += (*usedSize + *memAmount) - *totalSize;
-    pBuffer = realloc(pBuffer, *totalSize);
+    *pBuffer = realloc(*pBuffer, *totalSize);
 }
 
-void addPerson(void* pBuffer, int* i, char *tempName, char* tempAge, char *tempMail, char *nextPerson, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
+void addPerson(void** pBuffer, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
     
     //Aqui seria interessante eu criar uma pseudo struct
     printf("Nome: ");
@@ -124,7 +124,7 @@ void addPerson(void* pBuffer, int* i, char *tempName, char* tempAge, char *tempM
     //nextPerson += sizeof(temp)
 
     //antes de copiar pra dentro do espaço de memória, precisa realoocar com base no tamanho SE necessário
-    if(enoughSize(totalSize, usedSize, memAmount)) {
+    if(!enoughSize(totalSize, usedSize, memAmount)) {
         increaseSize(pBuffer, totalSize, usedSize, memAmount);
     }
     char *next = (char *)pBuffer + *usedSize;
