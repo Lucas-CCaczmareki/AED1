@@ -72,6 +72,10 @@ int main( void ) {
         switch (*opt) {
         case 1:
             /* ====================== Adicionar pessoa ====================== */
+            getchar();
+            printf("Email: ");
+            scanf("%[^\n]s", tempMail);
+            
             getchar(); //tira o \n do buffer do teclado
             printf("Nome: ");
             scanf("%[^\n]s", tempName);
@@ -80,11 +84,7 @@ int main( void ) {
             printf("Idade: ");
             scanf("%s", tempAge);
 
-            getchar();
-            printf("Email: ");
-            scanf("%[^\n]s", tempMail);
-
-            if(alreadyIn(pBuffer, tempName, usedSize, p, end, totalPeople)) {
+            if(alreadyIn(pBuffer, tempMail, usedSize, p, end, totalPeople)) {
                 printf("Essa pessoa ja esta na agenda!\n");
             } else {
                 *memAmount = strlen(tempName) + 1 + strlen(tempAge) + 1 + strlen(tempMail) + 1;
@@ -109,14 +109,14 @@ int main( void ) {
                 //points to the next free space
                 char *next = (char *)pBuffer + *usedSize;
                 
+                memcpy(next, tempMail, strlen(tempMail) + 1);
+                next += strlen(tempMail) + 1;
+
                 memcpy(next, tempName, strlen(tempName) + 1); //+1 to capture \0
                 next += strlen(tempName) + 1; //points right after \0
 
                 memcpy(next, tempAge, strlen(tempAge) + 1);
                 next += strlen(tempAge) + 1;
-
-                memcpy(next, tempMail, strlen(tempMail) + 1);
-                next += strlen(tempMail) + 1;
 
                 *usedSize += *memAmount;
                 *totalPeople += 1;
@@ -132,25 +132,32 @@ int main( void ) {
         case 3:
             /* ====================== Busca pessoa ====================== */
             getchar();
-            printf("Quem voce deseja buscar? ");
-            scanf("%[^\n]s", tempName);
+            printf("Quem voce deseja buscar? (digite email): ");
+            scanf("%[^\n]s", tempMail);
             
-
             p = (char *)pBuffer + dataRegion;
             end = (char *)pBuffer + *usedSize;
 
-            while( p < end ) {
-                if(strcmp(tempName, p) == 0) {
+            if(*totalPeople == 0) {
+                printf("Pessoa nao encontrada!\n\n");
+                break;
+            }
+
+            while( p <= end ) {
+                if(strcmp(tempMail, p) == 0) {
                     printf("--------------------------\n");
+                    printf("Email: %s\n", p);
+                    p += strlen(p) + 1;
+
                     printf("Nome: %s\n", p);
                     p += strlen(p) + 1;
 
                     printf("Idade: %s\n", p);
                     p += strlen(p) + 1;
-
-                    printf("Email: %s\n", p);
-                    p += strlen(p) + 1;
                     printf("--------------------------\n");
+                    break;
+                } else if(p == end) {
+                    printf("Pessoa nao encontrada!\n\n");
                     break;
                 } else {
                     //I could do this in a loop. Would be easier if someone wants to add new informations for each person
@@ -160,8 +167,6 @@ int main( void ) {
                     p += strlen(p) + 1; //at here, p points to the next name
                 }
             }
-            printf("Pessoa nao encontrada!\n\n");
-
             break;
             /* ========================================================== */
 
@@ -175,13 +180,13 @@ int main( void ) {
             } else {
                 while( p < end ) { //while the memory address is before end
                     printf("--------------------------\n");
-                    printf("Nome: %s\n", p); //prints the chars from p til the first \0
+                    printf("Email: %s\n", p); //prints the chars from p til the first \0
                     p += strlen(p) + 1;      //strlen return the amount of chars til the first \0, so p now points right after \0 (cuz +1)
 
-                    printf("Idade: %s\n", p);
+                    printf("Nome: %s\n", p);
                     p += strlen(p) + 1;
 
-                    printf("Email: %s\n", p);
+                    printf("Idade: %s\n", p);
                     p += strlen(p) + 1;
                     printf("--------------------------\n");
                 }
@@ -201,7 +206,7 @@ int main( void ) {
     
 }
 
-bool alreadyIn(void* pBuffer, char* tempName, int* usedSize, char* p, char* end, int* totalPeople) {
+bool alreadyIn(void* pBuffer, char* tempMail, int* usedSize, char* p, char* end, int* totalPeople) {
     p = (char *)pBuffer + dataRegion;
     end = (char *)pBuffer + *usedSize;
 
@@ -209,13 +214,13 @@ bool alreadyIn(void* pBuffer, char* tempName, int* usedSize, char* p, char* end,
         return false;
     } else {
         while( p < end ) {
-            if(strcmp(tempName, p) == 0) {
+            if(strcmp(tempMail, p) == 0) {
                 return true;
             } else {
-                //jumps 3 (name, age and mail) \0 to the next name
+                //jumps 3 (mail, name and age) \0 to the next nmail
                 p += strlen(p) + 1;
                 p += strlen(p) + 1;
-                p += strlen(p) + 1; //at here, p points to the next name
+                p += strlen(p) + 1; //at here, p points to the next mail
             }
         }
     }
