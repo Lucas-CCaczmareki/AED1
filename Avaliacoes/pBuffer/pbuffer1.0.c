@@ -9,9 +9,9 @@
 #define dataRegion      200
 
 void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
-void addPerson(void** pBuffer, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
+void addPerson(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
 bool enoughSize(int* totalSize, int* usedSize, int* memAmount);
-void increaseSize(void** pBuffer, int* totalSize, int* usedSize, int* memAmount);
+void increaseSize(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople);
 void showPeople (void* pBuffer, int* usedSize);
 
 /*
@@ -54,6 +54,20 @@ int main() {
     }
 }
 
+void updatePointers(void **pBuffer, int** opt, int** i, char** tempName, char** tempAge, char** tempMail, int** totalSize, int** usedSize, int** memAmount, int** totalPeople) {
+    *opt = (int *)pBuffer + controlRegion;
+    *i = (int *)pBuffer + 1;
+
+    *totalSize = (int *)(*pBuffer) + 2;
+    *usedSize = (int *)(*pBuffer) + 3;
+    *memAmount = (int *)(*pBuffer) + 4;
+    *totalPeople = (int *)(*pBuffer) + 5;
+
+    *tempName = (char *)(*pBuffer) + 24;
+    *tempAge = (char *)(*pBuffer) + 82;
+    *tempMail = (char *)(*pBuffer) + 132;
+}
+
 void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
     printf("================= Agenda =================\n");
     printf("1. Adicionar pessoa\n");
@@ -68,7 +82,7 @@ void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char 
     switch (*opt) {
     case 1:
         /* Adicionar pessoa */
-        addPerson(*pBuffer, i, tempName, tempAge, tempMail, totalSize, usedSize, memAmount, totalPeople);
+        addPerson(*pBuffer, opt, i, tempName, tempAge, tempMail, totalSize, usedSize, memAmount, totalPeople);
         break;
     
     case 2:
@@ -98,15 +112,24 @@ void menu(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char 
 }
 
 bool enoughSize(int* totalSize, int* usedSize, int* memAmount) {
-    return (*usedSize + *memAmount) < *totalSize; //retorna true caso não tenha
+    return (*usedSize + *memAmount) <= *totalSize; //retorna true caso não tenha
 }
 
-void increaseSize(void** pBuffer, int* totalSize, int* usedSize, int* memAmount) {
+void increaseSize(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
     *totalSize += (*usedSize + *memAmount) - *totalSize;
     *pBuffer = realloc(*pBuffer, *totalSize);
+
+    //OK, o problema aqui é que o pBuffer pode mudar completamente de endereço após realocar.
+    //Ou seja, todos os ponteiros derivados dele vão pro caralho
+    //Eu posso: dar o valor pro ponteiro sempre que eu for usar ou
+    //criar uma função que autaliza a cada realloc
+
+    //Função que atualiza a cada realloc:
+    updatePointers(&pBuffer, &opt, &i, &tempName, &tempAge, &tempMail, &totalSize, &usedSize, &memAmount, &totalPeople);
+
 }
 
-void addPerson(void** pBuffer, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
+void addPerson(void** pBuffer, int* opt, int* i, char *tempName, char* tempAge, char *tempMail, int *totalSize, int *usedSize, int* memAmount, int* totalPeople) {
     
     //Aqui seria interessante eu criar uma pseudo struct
     printf("Nome: ");
@@ -125,7 +148,7 @@ void addPerson(void** pBuffer, int* i, char *tempName, char* tempAge, char *temp
 
     //antes de copiar pra dentro do espaço de memória, precisa realoocar com base no tamanho SE necessário
     if(!enoughSize(totalSize, usedSize, memAmount)) {
-        increaseSize(pBuffer, totalSize, usedSize, memAmount);
+        increaseSize(&pBuffer, opt, i, tempName, tempAge, tempMail, totalSize, usedSize, memAmount, totalPeople);
     }
     char *next = (char *)pBuffer + *usedSize;
 
