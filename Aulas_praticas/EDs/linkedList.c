@@ -1,3 +1,4 @@
+//Lista encadeada
 //Implementação do gemini. Vou fazer a minha outra hora quando eu tiver mais tempo
 
 #include <stdio.h>
