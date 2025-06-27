@@ -9,43 +9,69 @@
 #define INITIAL_CAPACITY 100
 
 typedef struct {
-    char* data;    //1 caracter, representando a string
+    char* data;    //vetor de caracteres
     int top;
     int capacity;
 } Stack;
 
 //Chamada das funções
 //as funções sempre esperam um ponteiro para stack, a fim de modificar sempre a pilha original passada como parâmetro
-void initStack(Stack* stack);
+void initStack(Stack* stack, int tam_s);
 bool isEmpty(Stack *stack);
 bool isFull(Stack *stack);
-void push(Stack *stack, char* value);
-char* pop(Stack *stack);
-char* peek(Stack *stack);
+void push(Stack *stack, char value);
+char pop(Stack *stack);
+char peek(Stack *stack);
 int maximumGain(char* s, int x, int y);
 
 int main () {
     char *s = {"cdbcbbaaabab"};
     int x = 4,
-        y = 5;
-
+        y = 5,
+        score = 0;
+        
     printf("%s\n", s);
-    maximumGain(s, x, y);
+    score = maximumGain(s, x, y);
+    printf("%d", score);
 }
 
 int maximumGain(char* s, int x, int y) {
     int score = 0;
+    int tam_s = strlen(s);
     Stack stack_s;
-    initStack(&stack_s);
+    initStack(&stack_s, tam_s);
 
-    push(&stack_s, s[0]);
-    printf("%c", s[0]);
+    for(int i = 0; i < tam_s; i++) {
+        //primeiro precisa testar se tá buscando um x(ab) ou um y(ba)
+        if (x > y) {
+            //faz a lógica pra ab
+            push(&stack_s, s[i]);
+            if(peek(&stack_s) == 'a' && s[i+1] == 'b'){
+                i++;
+                push(&stack_s, s[i]);
+                pop(&stack_s);
+                pop(&stack_s);
+                score += x;
+            }
+        } else {
+            //faz a lógica pra ba
+            push(&stack_s, s[i]);
+            if(peek(&stack_s) == 'b' && s[i+1] == 'a'){
+                i++;
+                push(&stack_s, s[i]);
+                pop(&stack_s);
+                pop(&stack_s);
+                score += y;
+            }
+        }
+    }
+    //agora só faltou a lógica de desempilhar em outra e fazer ao contrário
+    //printf("%c", pop(&stack_s));
 
     return score;
 }
 
-/*
-Lógica do programa (brainstorm)
+/* Lógica do programa (brainstorm)
 posso fazer 2 pilhas: 1 pra empilhar o índice de ba e outra pra empilhar os índices de ab.
 Ai todo "pop" que eu fizer em algumas dessas pilhas soma x ou y numa variável chamada "gain" ou algo do tipo.
 
@@ -98,18 +124,17 @@ não acha nada não faz porra nenhuma, retorna o score (já q a string restante 
 blz, assim o score fica certinho, então dá pra fazer a lógica com duas pilhas (primeiro empilha da esquerda pra direita da string) e depois desempilha, empilhando em outro canto e conferindo o inverso. 
 */
 
-
-/*
+/* OK
 initStack
 inicializa uma pilha vazia com base em um espaço de memória já criado
 */
-void initStack(Stack *stack) {
-    stack->capacity = INITIAL_CAPACITY;
-    stack->data = (char*)malloc(stack->capacity * sizeof(char*));
+void initStack(Stack *stack, int tam_s) {
+    stack->capacity = tam_s;
+    stack->data = (char*)malloc(stack->capacity * sizeof(char));
     stack->top = -1; //Atribui o -1(espaço inexistente) pra identificar pilha vazia
 }
 
-/*
+/* OK
 isEmpty
 testa se o top está em -1 para ver se a pilha está vazia e retorna o resultado
 */
@@ -117,53 +142,43 @@ bool isEmpty(Stack *stack) {
     return stack->top == -1; //retorna o V ou F da comparação
 }
 
-/*
+/* OK
 isFull
 testa se o top está na última posição da pilha, e retorna verdadeiro ou falso
 */
 bool isFull(Stack *stack) {
-    //o array pilha de tamanho CAPACITY vai sempre até CAPACITY -1 por definição
+    //vai até capacity -1 sla n lembro pq
     return stack->top == stack->capacity - 1; //retorna o resultado da comparação
-}
-
-/*
-resize
-Doubles the capacity of the stac if needed.
-*/
-void resize(Stack* stack) {
-    stack->capacity *= 2; //seria muito custoso em tempo aumentar de 1 em 1
-    stack->data = (char*)realloc(stack->data, stack->capacity * sizeof(char*));
 }
 
 /*
 push
 Empilha um valor novo na pilha caso seja possível
 */
-void push(Stack *stack, char* value) {
+void push(Stack *stack, char value) {
     if(isFull(stack)) {
-        resize(stack);
+        printf("Algo de errado aconteceu!");
     }
-    stack->data[++(stack->top)] = value; //incrementa o topo e adiciona na próxima posição
+    stack->data[++(stack->top)] = value; //incrementa o topo e adiciona o caracter na próxima posição livre
 }
 
-/*
+/* OK
 pop
 Desempilha o último elemento da pilha (o topo, na lógica FIFO) caso seja possível
 */
-char* pop(Stack *stack) {
+char pop(Stack *stack) {
     if(isEmpty(stack)) {
         printf( "Erro: Pilha vazia!\n" );
         exit(1);
     }
-    //stack->top--;
     return stack->data[(stack->top)--]; //retorna o topo e diminui o topo em uma posição, jogando ele pro universo
 }
 
-/*
+/* OK
 peek
 Retorna o valor do último elemento da pilha (topo) sem alterar a estrutura de dados
 */
-char* peek(Stack *stack) {
+char peek(Stack *stack) {
     if (isEmpty(stack)) {
         printf( "Erro: Pilha vazia!\n" );
         exit(1);
@@ -171,13 +186,10 @@ char* peek(Stack *stack) {
     return stack->data[stack->top]; //retorna o valor do topo
 }
 
-/*
+/* OK
 freeStack
 Libera a memória alocada dinâmicamente pra qualquer pilha ou string q tenha sido usada
 */
 void freeStack(Stack* stack) {
-    for( int i = 0; i <= stack->top; i++ ) {
-        free(stack->data[i]); //libera as strings
-    }
-    free(stack->data); //libera o vetor de ponteiros pra char
+    free(stack->data); //libera o vetor de caracteres
 }
