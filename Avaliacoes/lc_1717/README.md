@@ -25,7 +25,7 @@ Total score = 5 + 4 + 5 + 5 = 19.
 ## O que foi feito em aula:
 Em aula, eu consegui finalizar a lógica/estratégia para resolver o problema (num comentário chamado brainstorm está o passo a passo que eu pensei pra resolver). A estratégia que eu usei foi retirar primeiro a subpalavra de maior pontuação usando uma pilha: eu colocaria caracter por caracter na pilha comparando se o caracter colocado e o próximo caracter da palavra formariam uma subpalavra válida, se formassem eu pulava ele e dava um pop. Se não, eu empilhava ele. Depois eu colocava a string que sobrou na pilha em ordem inversa (devido ao comportamento da pilha) em outra pilha e retirava a outra subpalavra seguindo a mesma lógica.
 
-Eu não consegui implementar o código inteiro em aula devido ao tempo, só a primeira passada.
+Eu não consegui implementar o código inteiro em aula devido ao tempo, só a primeira passada..
 
 ## O que foi feito em casa:
 Em casa, eu tentei finalizar a implementação, ela estava funcionando mas cheia de bugs, alguns deles:
