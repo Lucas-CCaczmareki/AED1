@@ -1,8 +1,8 @@
 /*
 DR MEMORY: OK 
-RESTRIÇÕES: Só da uma verificada se na tua função tu n acaba copiando e usando outra área da memória
+RESTRIÇÕES: OK
 COMMENTS & IDENTATION: OK
-VIDEO: NOT DONE
+VIDEO: OK
 */
 
 #include <stdio.h>
