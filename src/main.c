@@ -1,8 +1,19 @@
+#include "stack.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-int main(int argc, char const *argv[])
-{
-    printf("Hello World!\n");
+int main () {
+    Stack intStack;
+    initStack(&intStack, sizeof(int));
 
-    return 0;
+    for(int i = 0; i < 5; i++){
+        push(&intStack, &i);
+    }
+    
+    for(int i = 0; i < 5; i++){
+        printf("%d\n", *(int*)peek(&intStack));
+        free(pop(&intStack));
+    }
+    system("pause"); // Pausa o terminal no Windows
 }

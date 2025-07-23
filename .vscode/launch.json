@@ -1,4 +1,4 @@
-{
+/*{
     "version": "0.2.0",
     "configurations": [
         {
@@ -13,6 +13,37 @@
             "externalConsole": true,
             "MIMode": "gdb",
             "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe",
+        }
+    ]
+}*/
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch C/C++ (Makefile)", // Um nome mais descritivo
+            "type": "cppdbg", // Ou "mingw-gdb" se for a opção específica que você usa no Windows
+            "request": "launch",
+            // Ajustar o caminho para onde o SEU MAKEFILE gera o executável
+            // Seu Makefile gera em 'output/main.exe' (ou 'output/main' no Linux)
+            "program": "${workspaceFolder}/output/main.exe", // <--- CORRIGIDO: Caminho do executável gerado
+            "args": [],
+            "stopAtEntry": false,
+            // Definir o diretório de trabalho para a pasta onde o executável está
+            "cwd": "${workspaceFolder}/output", // <--- CORRIGIDO: CWD para a pasta 'output'
+            "environment": [],
+            "externalConsole": true, // Manter como true para ver a saída em uma janela separada
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe", // Verifique se este caminho está correto para o seu gdb
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            // <--- ADICIONADO: Tarefa a ser executada antes de iniciar o debug/execução
+            "preLaunchTask": "build" // Isso chama a sua tarefa 'build' do tasks.json (que executa 'mingw32-make')
         }
     ]
 }

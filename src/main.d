@@ -1,1 +1,1 @@
-src/main.o: src/main.c
+src/main.o: src/main.c include/stack.h
