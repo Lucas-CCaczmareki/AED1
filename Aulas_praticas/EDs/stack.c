@@ -5,31 +5,35 @@
 #include <ctype.h>
 #include <string.h>
 
-#define INITIAL_CAPACITY 100
-
-//I should haver implemented a struct for "data", so I could change that easily.
+#define INITIAL_CAPACITY 10
 
 //Isso aqui, posteriormente é interessante criar com alocação dinâmica, mas meu objetivo no momento é só entender o funcionamento em pilha.
 typedef struct {
-    char** data;    //vetor de strings (ponteiro pra ponteiro de char)
+    void** elements; //vetor de ponteiro para os elementos (qualquer tipo)
     int top;
     int capacity;
+    size_t elementSize; //size_t representa um inteiro sem sinal, esse tipo é usado para armazenar o tamanho em bytes de qualquer elemento
 } Stack;
 
 //Chamada das funções
 //as funções sempre esperam um ponteiro para stack, a fim de modificar sempre a pilha original passada como parâmetro
-void initStack(Stack* stack);
+void initStack(Stack* stack, size_t elementSize);
 bool isEmpty(Stack *stack);
 bool isFull(Stack *stack);
-void push(Stack *stack, char* value);
-char* pop(Stack *stack);
-char* peek(Stack *stack);
+void push(Stack *stack, const void* value);
+void* pop(Stack *stack);
+void* peek(Stack *stack);
 
 int main() {
     Stack stack;
-    initStack(&stack);
-    push(&stack, "1");
-    printf("%s", peek(&stack));
+    int valor = 10;
+    initStack(&stack, sizeof(int)); //isso inicializa a stack e define que ela vai funcionar pra ints
+
+
+    push(&stack, &valor);
+    printf("%d", *(int*)peek(&stack)); //converte pra ponteiro pra inteiro, e mostra o valor que o endereço do ponteiro tem
+    free(pop(&stack));
+
     return 0;
 }
 
@@ -37,10 +41,17 @@ int main() {
 initStack
 inicializa uma pilha vazia com base em um espaço de memória já criado
 */
-void initStack(Stack *stack) {
+void initStack(Stack *stack, size_t elementSize) {
     stack->capacity = INITIAL_CAPACITY;
-    stack->data = (char**)malloc(stack->capacity * sizeof(char*));
-    stack->top = -1; //Atribui o -1(espaço inexistente) pra identificar pilha vazia
+    stack->elements = (void**)malloc(stack->capacity * sizeof(void*));
+    
+    if (stack->elements == NULL) {
+        printf("Erro ao alocar a memória para a pilha");
+        exit(1);
+    }
+
+    stack->top = -1;
+    stack->elementSize = elementSize;
 }
 
 /*
@@ -66,43 +77,61 @@ Doubles the capacity of the stac if needed.
 */
 void resize(Stack* stack) {
     stack->capacity *= 2; //seria muito custoso em tempo aumentar de 1 em 1
-    stack->data = (char**)realloc(stack->data, stack->capacity * sizeof(char*));
+    stack->elements = (void**)realloc(stack->elements, stack->capacity * sizeof(void*));
+
+    if (stack->elements == NULL) {
+        printf("Erro ao realocar memória para a pilha!");
+        exit(1);
+    }
 }
 
 /*
 push
 Empilha um valor novo na pilha caso seja possível
 */
-void push(Stack *stack, char* value) {
+void push(Stack *stack, const void* value) {
     if(isFull(stack)) {
         resize(stack);
     }
-    stack->data[++(stack->top)] = value; //incrementa o topo e adiciona na próxima posição
+    stack->top++;
+    stack->elements[stack->top] = malloc(stack->elementSize); //cria um espaço para o elemento que vai ser apontado
+    
+    if (stack->elements[stack->top] == NULL) {
+        printf("Erro ao alocar memória para o elemento");
+        exit(1);
+    }
+    
+    memcpy(stack->elements[stack->top], value, stack->elementSize);
+    //faz uma cópia do valor para qual o endereço recebido pelo push aponta
+
 }
 
 /*
 pop
 Desempilha o último elemento da pilha (o topo, na lógica FIFO) caso seja possível
 */
-char* pop(Stack *stack) {
+void* pop(Stack *stack) {
     if(isEmpty(stack)) {
         printf( "Erro: Pilha vazia!\n" );
         exit(1);
     }
-    //stack->top--;
-    return stack->data[(stack->top)--]; //retorna o topo e diminui o topo em uma posição, jogando ele pro universo
+    void* data = stack->elements[stack->top];
+    stack->elements[stack->top] = NULL; //evita que fique qualquer ponteiro pro nada
+    stack->top--; //diminui a pilha efetivamente
+    return data;    //retorna o ponteiro pro dado retirado
+                    //Quem chamou a função é responsável por liberar esse ponteiro
 }
 
 /*
 peek
 Retorna o valor do último elemento da pilha (topo) sem alterar a estrutura de dados
 */
-char* peek(Stack *stack) {
+void* peek(Stack *stack) {
     if (isEmpty(stack)) {
         printf( "Erro: Pilha vazia!\n" );
         exit(1);
     }
-    return stack->data[stack->top]; //retorna o valor do topo
+    return stack->elements[stack->top]; //retorna o valor do topo
 }
 
 /*
@@ -111,7 +140,12 @@ Libera a memória alocada dinâmicamente pra qualquer pilha ou string q tenha si
 */
 void freeStack(Stack* stack) {
     for( int i = 0; i <= stack->top; i++ ) {
-        free(stack->data[i]); //libera as strings
+        free(stack->elements[i]); //libera a memória de cada elemento
     }
-    free(stack->data); //libera o vetor de ponteiros pra char
+    free(stack->elements); //libera o vetor de ponteiros pros elementos
+    
+    //Opcional, mas é uma boa liberar
+    stack->elements = NULL;
+    stack->top = -1;
+    stack->capacity = 0;
 }
