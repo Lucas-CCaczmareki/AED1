@@ -23,7 +23,7 @@ void initStack(Stack *stack, size_t elementSize) {
         exit(1);
     }
 
-    stack->top = -1;
+    stack->top = -1; //"índice" da pilha
     stack->elementSize = elementSize;
 }
 
