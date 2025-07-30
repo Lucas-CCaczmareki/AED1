@@ -37,8 +37,9 @@ void fillArray(struct TreeNode* root, int** preOrderArray, int* capacity, int* c
 //quando ele volta pra cá com a chamada do 2 como raiz, ele não entra no outro if por que ele é um else if
 
 
-    } else if (root->right != NULL) {
-
+    }
+    
+    if (root->right != NULL) {
         if (*current_size == *capacity) {
             *capacity *= 2; //dobra o tamanho
             int *new_arr = (int*)realloc(*preOrderArray, (*capacity) * sizeof(int));
@@ -49,7 +50,9 @@ void fillArray(struct TreeNode* root, int** preOrderArray, int* capacity, int* c
         (*current_size)++;
         fillArray(root->right, preOrderArray, capacity, current_size);
 
-    } else {
+    }
+    
+    if (root->left == NULL && root->right == NULL) {
         //faz um return com os valores pra caso isso aqui caia no caso de a root não ter nenhum filho
         return;
     }
