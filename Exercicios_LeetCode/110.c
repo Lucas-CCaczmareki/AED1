@@ -18,12 +18,15 @@ int height(struct TreeNode* root){
     int alt_esq = 0,
         alt_dir = 0;
 
+    //Trata o caso especial de árvore vazia
     if(root == NULL) {
         return 0;
     }
 
+    //Trata o caso especial de só ter a raiz
     if(root->left == NULL && root->right == NULL) {
         return 1;
+    //Trata os outros casos?
     } else if (root->left == NULL && root->right != NULL) {
         alt_esq = 0;
         alt_dir = height(root->right);
@@ -51,12 +54,12 @@ int height(struct TreeNode* root){
     if(abs(alt_esq - alt_dir) > 1) { //ta desbalanceada
         return -1;
     } else { //ta balanceada
+        //Esse ternário aqui retorna 1 + a maior altura. Pra retornar a altura da árvore ou subarvore
         return 1 + (alt_esq > alt_dir ? alt_esq : alt_dir);
     }
-
-
-
 }
+
+//Essa função só diz se a nossa árvore tá balanceada ou não.
 bool isBalanced(struct TreeNode* root) {
     int balanced = 0;
     balanced = height(root);

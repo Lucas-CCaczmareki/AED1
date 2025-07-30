@@ -1,54 +1,141 @@
-#include "stack.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+// Binary tree preorder traversal
+// Given the root of a binary tree, return the preorder traversal (an array of the values in preorder) of its nodes values
 
-int maxChunksToSorted(int *arr, int arrSize);
 
-int main () {
-    int arr[] = {1, 0, 2, 3, 4};
-    int arrSize = 5;
-    int maxChunks = maxChunksToSorted(&arr, arrSize);
+//Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+};
 
-    printf("%d\n", maxChunks);
+void fillArray(struct TreeNode* root, int** preOrderArray, int* capacity, int* current_size) {
+    if(*current_size == 0) {
+        if(root != NULL) {
+            *capacity = 10;
+            int *new_arr = (int*)realloc(*preOrderArray, (*capacity) * sizeof(int));
+            *preOrderArray = new_arr;
+            (*preOrderArray)[*current_size] = root->val;
+            (*current_size)++;
+        } else {
+            return; //vetor vazio
+        }
+    }
 
-    system("pause");
+    if(root->left != NULL) {
+        if (*current_size == *capacity) {
+            *capacity *= 2; //dobra o tamanho
+            int *new_arr = (int*)realloc(*preOrderArray, (*capacity) * sizeof(int));
+            *preOrderArray = new_arr;
+        }
 
-    return 0;
+        (*preOrderArray)[*current_size] = root->left->val;
+        (*current_size)++;
+        fillArray(root->left, preOrderArray, capacity, current_size);
+//quando ele volta pra cá com a chamada do 2 como raiz, ele não entra no outro if por que ele é um else if
+
+
+    } else if (root->right != NULL) {
+
+        if (*current_size == *capacity) {
+            *capacity *= 2; //dobra o tamanho
+            int *new_arr = (int*)realloc(*preOrderArray, (*capacity) * sizeof(int));
+            *preOrderArray = new_arr;
+        }
+
+        (*preOrderArray)[*current_size] = root->right->val;
+        (*current_size)++;
+        fillArray(root->right, preOrderArray, capacity, current_size);
+
+    } else {
+        //faz um return com os valores pra caso isso aqui caia no caso de a root não ter nenhum filho
+        return;
+    }
+    return;
 }
 
 
-/*
-Resolve o problema usando uma pilha que só armazena os maiores números de cada chunk.
-Ele empilha um número, e enquanto encontrar menores, vai formando aquela chunk.
-Se achar um maior, armazena na pilha pois pode ser um possível novo chunk.
 
-Continua percorrendo o vetor, se achar um menor que o último empilhado, testa com todos da pilha
-pra ver se não é menor que o penúltimo ou anterior a isso empilhados. Se for, significa que esses números
-todos formam apenas um chunk. Por isso ele desempilha tudo e deixa apenas o maior elemento do chunk.
 
-Continua isso até chegar ao fim do vetor.
-*/
-int maxChunksToSorted(int *arr, int arrSize) {
-    //Stack to store the maximum elements of each chunk
-    Stack intStack;
-    initStack(&intStack, sizeof(int));
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+int* preorderTraversal(struct TreeNode* root, int* returnSize) {
+    //The returnsize here contains the address of a variable. I'll fill it with the size I've found.
+    int *preOrderArray = NULL;
+    int capacity = 0;
+    int current_size = 0;   
 
-    for (int i = 0; i < arrSize; i++) {
-        //Case 1: current element is larger, starts a new chunk
-        if (isEmpty(&intStack) || arr[i] > *(int*)peek(&intStack)) {
-            push(&intStack, &arr[i]);
-        } else {
-            //Case 2: Merge chunks
-            int maxElement = *(int*)peek(&intStack);
-            while (!isEmpty(&intStack) && arr[i] < *(int*)peek(&intStack)) {
-                free(pop(&intStack));                
-            }
-            push(&intStack, &maxElement);
+    fillArray(root, &preOrderArray, &capacity, &current_size);
+    
+    *returnSize = current_size;
+    return preOrderArray;
+}
+
+
+
+
+
+
+// A simple utility function to create a new tree node.
+// This is for building the test case tree in main.
+struct TreeNode* createNode(int val) {
+    struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+    if (newNode == NULL) {
+        perror("Failed to allocate memory for TreeNode");
+        exit(EXIT_FAILURE);
+    }
+    newNode->val = val;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+// A utility function to free the memory allocated for the tree.
+// Good practice to prevent memory leaks in your local tests.
+void freeTree(struct TreeNode* root) {
+    if (root == NULL) {
+        return;
+    }
+    freeTree(root->left);
+    freeTree(root->right);
+    free(root);
+}
+
+// The main function to test your implementation.
+// This will not be submitted to LeetCode.
+int main() {
+    // Construct a sample binary tree.
+    // Example: [1, null, 2, 3]
+    // The tree looks like this:
+    //      1
+    //       \
+    //        2
+    //       /
+    //      3
+    struct TreeNode* root = createNode(1);
+    root->right = createNode(2);
+    root->right->left = createNode(3);
+
+    // This is where your code will be called.
+    int returnSize = 0;
+    int* result = preorderTraversal(root, &returnSize);
+
+    // Print the result to the console for verification.
+    printf("Preorder Traversal: [");
+    for (int i = 0; i < returnSize; i++) {
+        printf("%d", result[i]);
+        if (i < returnSize - 1) {
+            printf(", ");
         }
     }
-    int size_stack = intStack.top + 1; //top é um índice. +1 por que o primeiro elemento é 0.
-    freeStack(&intStack); //libera a memória da pilha e de seus elementos
+    printf("]\n");
 
-    return size_stack;
+    // Clean up allocated memory.
+    free(result);
+    freeTree(root);
+
+    system("pause");
+    return 0;
 }
