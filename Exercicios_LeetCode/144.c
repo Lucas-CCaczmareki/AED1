@@ -1,3 +1,10 @@
+/* Usos da IA
+Relembrando ponteiros
+Como fazer a alocação dinâmica pra um vetor que tinha que crescer conforme eu lia a árvore
+Fazer a função main pra eu só resolver o problema.
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 // Binary tree preorder traversal
