@@ -54,7 +54,7 @@ int dfs(int* nums, int numsSize) {
 }
 
 int numOfWays(int* nums, int numsSize) {
-    return dfs(nums, numsSize);
+    
 }
 // long long factorial(int n); // Talvez você precise de uma função para o fatorial
 
@@ -72,8 +72,6 @@ int main() {
     printf("\nTest Case 2 (nums = {3, 1, 2, 5, 4, 6}):\n");
     printf("Expected result: 5\n");
     printf("Your result: %d\n", numOfWays(nums2, size2));
-
-    system("pause");
 
     return 0;
 }
