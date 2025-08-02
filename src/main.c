@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 //Função recursiva para calcular o fatorial de um número
 long long fat(int n) {
@@ -9,54 +10,51 @@ long long fat(int n) {
     }
 }
 
-int dfs(int* nums, int numsSize) {
+long long dfs(int* nums, int numsSize) {
+    //retorna 1, pois com 3 nodos só tem uma possibilidade correta além da padrão.
     if(numsSize < 3) {
-        return 1; //retorna 1, pois com 3 nodos só tem uma possibilidade correta além da padrão.
+        return 1;           
     }
     
-    int root = nums[0];
+    int root = nums[0];     //1a posição é sempre fixa
 
     //Cria 2 vetores com o tamanho de numsSize pra facilitar a minha vida por enquanto
     int *left_nodes = (int*)malloc(sizeof(int) * numsSize);
     int *right_nodes = (int*)malloc(sizeof(int) * numsSize);
 
-    int l = 0, r = 0; //contadores de índice pro vetor left e right
+    //contadores de índice pro vetor left e right
+    int l = 0, r = 0; 
 
+    //Percorre o vetor, formando as subarvores mantendo a ordem RELATIVA
     for(int i = 1; i < numsSize; i++) {
-        //Se for maior que a root, faz parte do right nodes
-        //Se for menor, faz parte dos left nodes
-        if(nums[i] > root) {
+        if(nums[i] > root) { 
+            //Se for maior que a root, faz parte do right nodes (subarvore da direita)
             right_nodes[r] = nums[i];
             r++;
-        } else {
+        } else { 
+            //Se for menor, faz parte dos left nodes (subarv da esquerda)
             left_nodes[l] = nums[i];
             l++;
         }
-    }
-    //Agora com base nesses 2 vetores eu sei que eles podem se permutar entre si mas não podem mudar
-    //suas ordens individuais. Respeitando a condição de um filho nunca aparece antes do pai pra
-        //formar a mesma árvore.
+    }   
+    //OK agora eu tenho 2 vetores com a ordem relativa (filhos não podem aparecer antes dos pais) preservada!
 
-    //Ai vem a parte que eu não saquei que é os lance matemáticos pra calcula a Combinação de K até N
-    //Cleft/m-1 -> sendo m o tamanho do array (-1 por causa da root que é fixa)
+    //E agora eu tenho X maneiras de escolher L(ou R) posições entre as numsSize-1 livres
+        //PS, ao escolher L posições, as que sobrarem são preenchidas pelo R.
+    
+    //X é dado pela Combinação, C(numSize-1, L) ou C(numsSize-1, R). 
+        //Pois como numsSize-1 = L + R, a simetria da formula da combinação é mantida
 
-    int P = (fat(numsSize - 1)) / (fat(l)*(numsSize - 1 - l));
+    long long C = (fat(numsSize - 1)) / (fat(l)*(numsSize - 1 - l)); //Calcula a formula da combinação pra esquerda
 
 
-        //Pelo que eu entendi, essa fórmula vai me retornar o valor de quantas posições válidas possíveis a subárvore consegue assumir com base no tamanho do vetor. E ai qualquer subárvore formada a partir da raiz (índice 0 do vetor) vai assumir essa combinação possível.
-        //No final é só multiplicar todas as combinaçãoes, mas tipo, como?
-
-    return P * dfs(right_nodes, r) * dfs(left_nodes, l);
-
-    //return dfs(left_nodes, numsSize) * dfs(right_nodes) *
-
-    //return 0; //provisorio
+    return C * dfs(right_nodes, r) * dfs(left_nodes, l);
 }
 
 int numOfWays(int* nums, int numsSize) {
-    return dfs(nums, numsSize);
+    long long result = dfs(nums, numsSize) - 1;
+    return result;
 }
-// long long factorial(int n); // Talvez você precise de uma função para o fatorial
 
 int main() {
     int nums1[] = {2, 1, 3};
