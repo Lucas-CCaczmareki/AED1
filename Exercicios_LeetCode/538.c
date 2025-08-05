@@ -1,6 +1,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct TreeNode {
+    int val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+};
+
+/*
+Percorre a árvore em ordem reversa (direita, raiz, esquerda)
+Acumula a soma dos valores maiores
+
+*/
+void reverseInOrderTraversal(struct TreeNode* node, int* cumulative_sum) {
+    //Se o nó for nulo, faz nada
+    if (node == NULL) {
+        return;
+    }
+
+    //Visita a subárvore direita primeiro
+    //A recursão vai até o nó mais a direita
+    reverseInOrderTraversal(node->right, cumulative_sum);
+
+    //Processa o nó atual (a Raiz do percurso)
+    //A variável cumulative_sum agora tem a soma de todos os nós que são maiores que o atual
+    *cumulative_sum += node->val;
+    node->val = *cumulative_sum;
+    
+    //Visita a subárvore esquerda
+    //A soma acumulada já inclui o valor da raiz atual e de toda subárvore direita
+    reverseInOrderTraversal(node->left, cumulative_sum);
+}
+
+/*
+Função que converte a BST pra "Greater Tree"
+*/
+
+struct TreeNode* convertBST(struct TreeNode* root) {
+    //Inicializa a soma acumulada com 0;
+    int sum = 0;
+
+    //Chama a função auxiliar que faz o trabalho de verdade
+    reverseInOrderTraversal(root, &sum);
+
+    // Retorna a raiz da árvore que já teve os valores modificados
+    return root;
+}
+
+//Código antigo meio bugado que eu tava usando
+/*
 // Defina a estrutura do nó da árvore
 struct TreeNode {
     int val;
@@ -48,17 +96,7 @@ struct TreeNode* convertBST(struct TreeNode* root) {
     convertValues(root);
 
 }
-
-
-
-
-
-
-
-
-
-
-
+*/
 
 // Funções auxiliares para criar e imprimir a árvore de teste
 struct TreeNode* newTreeNode(int val) {
