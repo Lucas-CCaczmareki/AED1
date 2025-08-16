@@ -108,6 +108,7 @@ struct ListNode* sortList(struct ListNode* head) {
         aux = aux->next;
         
     }
+    //Por que quando chega no último elemento, ele aponta pro NULL, e sai sem somar.
     if(tam != 0) {
         tam++;
     }

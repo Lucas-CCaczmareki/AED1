@@ -1,5 +1,4 @@
-//leetcode 148
-
+//leetcode 148, versão desenvolvida em casa
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -41,7 +40,10 @@ struct ListNode* merge(struct ListNode* l, struct ListNode* r) {
     struct ListNode* tail = &dummy;
 
     //Percorre as duas listas procurando o menor entre elas
-    //Mostrar a lógica de percorrer pensada com um desenho:
+    
+    //************************* !!!! ***************************
+    //Mostrar a lógica de percorrer pensada com um desenho
+    //**********************************************************
     while(l != NULL && r != NULL) {
         if (l->val <= r->val) {
             //Se o valor do l for o menor, então ele é o primeiro da lista
@@ -81,18 +83,21 @@ struct ListNode* sortList(struct ListNode* head) {
     struct ListNode *slow = head; 
     struct ListNode *fast = head->next; //começa 1 na frente pra lógica funcionar com ímpares
 
-    //Demonstrar a lógica com um desenho:
-    while (fast != NULL && fast->next != NULL){
-        slow = slow->next;
-        fast = fast->next->next;
-    }
 
-    /*
+    /* Exemplo da lógica
     * Agora slow ta na metade, mas imagine
     *  1 -> 2 -> 3 -> 4
     * Slow aponta pro 2, e para dividir a lista, right_head deve ser o 3.
     * A mesma lógica funciona para os ímpares.
     */
+
+    //************************* !!!! ***************************
+    // Mostrar a lógica dos ponteiros com um desenho
+    //**********************************************************
+    while (fast != NULL && fast->next != NULL){
+        slow = slow->next;
+        fast = fast->next->next;
+    }
 
     //head se torna a lista à esquerda
     //right_head se torna a lista à direita
@@ -100,6 +105,10 @@ struct ListNode* sortList(struct ListNode* head) {
     
     //Quebra a lista entre parte direita e esquerda
     slow->next = NULL; 
+
+    //************************* !!!! ***************************
+    // Mostrar a lógica recursiva com um desenho
+    //**********************************************************
 
     //Agora dividimos a lista de novo até sobrar 1 elementos só.
     struct ListNode *l = sortList(head);
