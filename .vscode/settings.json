@@ -3,5 +3,6 @@
         "limits.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c"
-    }
+    },
+    "makefile.configureOnOpen": false
 }

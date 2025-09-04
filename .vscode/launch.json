@@ -16,7 +16,7 @@
         }
     ]
 }*/
-
+/*
 {
     "version": "0.2.0",
     "configurations": [
@@ -44,6 +44,39 @@
             ],
             // <--- ADICIONADO: Tarefa a ser executada antes de iniciar o debug/execução
             "preLaunchTask": "build" // Isso chama a sua tarefa 'build' do tasks.json (que executa 'mingw32-make')
+        }
+    ]
+}
+*/
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Executar/Depurar C (Makefile)",
+            "type": "cppdbg",
+            "request": "launch",
+            // 1. Caminho para o executável que o seu Makefile cria.
+            "program": "${workspaceFolder}/output/main.exe",
+            "args": [],
+            "stopAtEntry": false,
+            // 2. Diretório de trabalho (onde o programa vai rodar).
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            // 3. Caminho para o NOVO depurador de 64 bits.
+            //    (Se você instalou o MSYS2 como sugeri)
+            "miDebuggerPath": "C:\\Development\\w64devkit\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            // 4. Diz ao VSCode para compilar ('make') antes de tentar executar.
+            "preLaunchTask": "build"
         }
     ]
 }
